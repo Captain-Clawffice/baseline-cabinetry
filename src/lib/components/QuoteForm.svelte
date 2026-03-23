@@ -32,18 +32,26 @@
 		const data = new FormData(form);
 
 		try {
-			const response = await fetch('https://formspree.io/f/REPLACE_WITH_FORM_ID', {
+			const response = await fetch('/api/contact', {
 				method: 'POST',
-				body: data,
-				headers: { Accept: 'application/json' }
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					name: data.get('name'),
+					email: data.get('email'),
+					phone: data.get('phone'),
+					projectType: data.get('project_type'),
+					timeline: data.get('timeline'),
+					message: data.get('message')
+				})
 			});
+
+			const json = await response.json();
 
 			if (response.ok) {
 				status = 'success';
 				form.reset();
 			} else {
-				const json = await response.json();
-				errorMessage = json.errors?.map((e: { message: string }) => e.message).join(', ') || 'Submission failed.';
+				errorMessage = json.error || 'Submission failed.';
 				status = 'error';
 			}
 		} catch {
